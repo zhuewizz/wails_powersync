@@ -1,0 +1,17 @@
+# 构建产物
+bin/
+frontend/dist/
+frontend/node_modules/
+*.syso
+
+# 本地数据库（自检参数 -db 会写这里）
+data/
+frontend/bindings/
+*.exe
+out.log
+
+# task 运行的校验缓存
+.task/
+
+# 连接参数（用户本机填写，不入库）
+config.json

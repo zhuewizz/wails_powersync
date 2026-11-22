@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PowerSync 双向同步演示</title>
+  <link rel="stylesheet" href="/src/style.css"/>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">⇄</span>
+    <div>
+      <div class="title">PowerSync 双向同步</div>
+      <div class="sub" id="dbpath">—</div>
+    </div>
+  </div>
+
+  <div class="status" id="status">
+    <span class="pill" id="pill-conn" title="是否连上同步服务">连接 …</span>
+    <span class="pill" id="pill-net" title="网络探测">网络 …</span>
+    <span class="pill" id="pill-cursor" title="同步游标">cursor —</span>
+    <span class="pill" id="pill-buckets" title="bucket 数">buckets —</span>
+    <span class="pill" id="pill-queue" title="待上传队列">待上传 —</span>
+    <span class="pill" id="pill-sync" title="最近同步时间">—</span>
+  </div>
+
+  <div class="actions">
+    <button id="btn-settings" class="ghost" title="连接设置">⚙ 设置</button>
+    <button id="btn-sync" class="ghost" title="重连同步">重连</button>
+    <button id="btn-reload" class="ghost" title="刷新当前表">刷新</button>
+    <button id="btn-insert" class="primary" title="在当前表新增一行">＋ 新增</button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <input id="filter" type="search" placeholder="过滤表名…" autocomplete="off"/>
+      <label class="chk"><input id="only-data" type="checkbox" checked/> 只看有数据</label>
+    </div>
+    <ul id="tables" class="tables"></ul>
+    <div class="sidebar-foot" id="tables-foot">—</div>
+  </aside>
+
+  <section class="content">
+    <div class="content-head">
+      <div>
+        <h2 id="table-title">请选择左侧的表</h2>
+        <div class="hint" id="table-hint">—</div>
+      </div>
+      <div class="toolbar">
+        <label class="chk" title="含 deleted_at 非空的行"><input id="include-deleted" type="checkbox"/> 显示已删除</label>
+        <label class="page-size">每页
+          <select id="page-size">
+            <option>50</option>
+            <option selected>100</option>
+            <option>200</option>
+            <option>500</option>
+          </select>
+        </label>
+        <button id="btn-prev" class="ghost">‹ 上一页</button>
+        <span class="page-info" id="page-info">—</span>
+        <button id="btn-next" class="ghost">下一页 ›</button>
+        <button id="btn-check" class="ghost" title="对比本地与后端行数">核对后端</button>
+      </div>
+    </div>
+
+    <div class="grid-wrap" id="grid-wrap">
+      <table class="grid" id="grid">
+        <thead id="grid-head"></thead>
+        <tbody id="grid-body"></tbody>
+      </table>
+      <div class="empty" id="grid-empty">还没有选择表</div>
+    </div>
+  </section>
+</main>
+
+<!-- 连接设置 -->
+<div class="modal-mask" id="setup" hidden>
+  <div class="modal" style="width:min(680px,92vw)">
+    <div class="modal-head">
+      <h3>连接设置</h3>
+    </div>
+    <div class="modal-body" style="grid-template-columns:1fr 1fr">
+      <div class="field">
+        <label><span>PowerSync 服务地址</span><span class="type">endpoint</span></label>
+        <input id="cfg-endpoint" type="text" placeholder="http://host:8080"/>
+      </div>
+      <div class="field">
+        <label><span>fetch_credentials RPC</span><span class="type">rpc</span></label>
+        <input id="cfg-rpc" type="text" placeholder="http://host:8089/rest/rpc/fetch_credentials"/>
+      </div>
+      <div class="field">
+        <label><span>PostgREST base</span><span class="type">rest（可选）</span></label>
+        <input id="cfg-rest" type="text" placeholder="http://host:8089/rest"/>
+      </div>
+      <div class="field"></div>
+      <div class="field">
+        <label><span>box_code</span><span class="type">柜号</span></label>
+        <input id="cfg-box" type="text"/>
+      </div>
+      <div class="field">
+        <label><span>org_code</span><span class="type">组织</span></label>
+        <input id="cfg-org" type="text"/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="hint">保存后会写入可执行文件同目录的 <code>config.json</code>，并立即重连。</span>
+      <div class="spacer"></div>
+      <button class="ghost" id="setup-cancel">取消</button>
+      <button class="primary" id="setup-save">保存并连接</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增/编辑弹窗 -->
+<div class="modal-mask" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">新增</h3>
+      <button class="icon" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body" id="modal-fields"></div>
+    <div class="modal-foot">
+      <label class="chk" id="null-hint-wrap">
+        <span class="hint">留空 = 空字符串；勾选「NULL」可显式写入 NULL</span>
+      </label>
+      <div class="spacer"></div>
+      <button class="ghost" id="modal-cancel">取消</button>
+      <button class="primary" id="modal-ok">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

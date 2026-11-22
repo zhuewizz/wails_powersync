@@ -1,0 +1,42 @@
+# 统一换行：仓库内一律 LF，避免 Windows 上反复刷 CRLF 警告
+* text=auto eol=lf
+
+# 这些脚本必须是 CRLF，否则 PowerShell 5.1 / cmd 会有兼容问题
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# 二进制（不要做换行转换）
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.db   binary
+*.exe  binary
+*.syso binary
+*.ttf  binary
+
+# ---- GitHub 语言统计：只保留 Go ----
+# Wails 模板（Java/NSIS/Obj-C/Gradle/XML…）和前端（JS/CSS/HTML）不参与语言占比，
+# 否则仓库会显示成 Java。想改回来就删掉这一段。
+build/**        linguist-vendored
+frontend/**     linguist-vendored
+*.json          linguist-vendored
+*.yml           linguist-vendored
+*.yaml          linguist-vendored
+*.plist         linguist-vendored
+*.md            linguist-documentation
+*.java          linguist-vendored
+*.gradle        linguist-vendored
+*.xml           linguist-vendored
+*.nsi           linguist-vendored
+*.nsh           linguist-vendored
+*.m             linguist-vendored
+*.h             linguist-vendored
+*.pbxproj       linguist-vendored
+*.storyboard    linguist-vendored
+*.sh            linguist-vendored
+*.css           linguist-vendored
+*.js            linguist-vendored
+*.html          linguist-vendored
