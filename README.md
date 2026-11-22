@@ -116,7 +116,7 @@ wails_power/
 | 仓库 | 说明 |
 | --- | --- |
 | https://github.com/zhuewizz/wails_powersync | **本项目**（Wails 桌面版） |
-| https://github.com/zhuewizz/powersync_golang | SDK（private，tag v0.1.0） |
+| https://github.com/zhuewizz/powersync_golang | SDK（**public**，tag v0.1.0） |
 
 日常推送：
 
@@ -127,11 +127,11 @@ git commit -m "feat: ..."
 git push
 ```
 
-> 两个仓库都是 **private**，别人 clone 需要授权（GitHub 登录或 PAT）。
+> 两个仓库都是 **public**，可直接 clone / `go get`。
 
 ### 别处 clone 后怎么编译
 
-SDK 是私有的，且本项目 go.mod 用 replace 指向本地 SDK 目录，所以：
+本项目 go.mod 用 replace 指向本地 SDK 目录（方便同时改 SDK 和界面），所以：
 
 ```powershell
 # 两个仓库放成兄弟目录
@@ -145,7 +145,6 @@ wails3 build        # frontend 依赖 + bindings + 前端产物都会自动生�
 如果想直接用远端 SDK 版本（不 clone SDK）：
 
 ```powershell
-$env:GOPRIVATE = "github.com/zhuewizz/*"   # 私有仓库
 go mod edit -dropreplace=github.com/zhuewizz/powersync_golang
 go mod edit -require=github.com/zhuewizz/powersync_golang@v0.1.0
 go mod tidy
