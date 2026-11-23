@@ -19,6 +19,7 @@ const state = {
   onlyData: true,
   includeDeleted: false,
   setupOpen: false,
+  setupAuto: false,   // true = 因未配置而自动弹出（状态刷新后可自动关闭）；手动点 ⚙ 的不受影响
   editingID: null,   // null = 新增
   ready: false,
 };
@@ -98,17 +99,19 @@ function renderStatus(st) {
   $("btn-insert").disabled = st.readOnly || !st.ready || st.needsSetup;
   $("btn-sync").disabled = st.readOnly || !st.ready || st.needsSetup;
   if (st.needsSetup) {
-    openSetup(st.config || {});
-  } else if (state.setupOpen) {
+    openSetup(st.config || {}, true);
+  } else if (state.setupOpen && state.setupAuto) {
+    // 只自动关闭“自动弹出”的那个；手动打开的设置框等用户自己关
     closeSetup();
   }
 }
 
 // ---------------------------------------------------------------- 连接设置
 
-function openSetup(cfg) {
+function openSetup(cfg, auto = false) {
   if (state.setupOpen) return;
   state.setupOpen = true;
+  state.setupAuto = auto;
   const set = (id, v) => { const el = $(id); if (el) el.value = v || ""; };
   set("cfg-endpoint", cfg.endpoint);
   set("cfg-rpc", cfg.rpc);
@@ -122,6 +125,7 @@ function openSetup(cfg) {
 
 function closeSetup() {
   state.setupOpen = false;
+  state.setupAuto = false;
   $("setup").hidden = true;
 }
 
@@ -493,7 +497,7 @@ function bindUI() {
       toast("核对失败：" + err, "err");
     }
   };
-  $("btn-settings").onclick = () => openSetup((state.status && state.status.config) || {});
+  $("btn-settings").onclick = () => openSetup((state.status && state.status.config) || {}, false);
   $("setup-cancel").onclick = () => {
     if (state.status && state.status.needsSetup) {
       toast("还没配置连接参数，填完才能同步", "err");
@@ -528,6 +532,7 @@ async function boot() {
   bindUI();
 
   Events.On(SyncStatus, (ev) => {
+    state.status = ev.data || {};
     renderStatus(ev.data || {});
     if (!state.table && ev.data && ev.data.ready) loadTables();
   });
